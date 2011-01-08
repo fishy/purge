@@ -1,12 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	>
+<LinearLayout
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="5sp">
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:padding="5sp">
+		<TextView  
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:text="@string/days"
+			android:paddingRight="5sp"
+			/>
+		<EditText
+			android:id="@+id/days"
+			android:text="30"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:numeric="integer"
+			/>
+	</LinearLayout>
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:background="@drawable/divider_horizontal_dark"
+		/>
+</LinearLayout>
+<LinearLayout
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="5sp">
+	<CheckBox
+		android:id="@+id/call_log"
+		android:text="@string/call_log"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="5sp"
+		android:paddingBottom="5sp"
+		android:checked="true"
+		/>
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:background="@drawable/divider_horizontal_dark"
+		/>
+</LinearLayout>
+<LinearLayout
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="5sp">
+	<CheckBox
+		android:id="@+id/sms"
+		android:text="@string/sms"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingTop="5sp"
+		android:checked="true"
+		/>
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingBottom="5sp">
+		<View
+			android:layout_width="30dp"
+			android:layout_height="fill_parent"
+			/>
+		<CheckBox
+			android:id="@+id/locked_sms"
+			android:text="@string/locked_sms"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:checked="false"
+			/>
+	</LinearLayout>
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dp"
+		android:background="@drawable/divider_horizontal_dark"
+		/>
+</LinearLayout>
+<LinearLayout
+	android:gravity="bottom"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center">
+		
+		<Button
+			android:id="@+id/do_it"
+			android:text="@string/do_it"
+			android:layout_width="100sp"
+			android:layout_height="wrap_content"
+			/>
+		<Button
+			android:text="@string/close"
+			android:id="@+id/close"
+			android:layout_width="100sp"
+			android:layout_height="wrap_content"
+			/>
+</LinearLayout>
+
+</LinearLayout>
+
 </LinearLayout>

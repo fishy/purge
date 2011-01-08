@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, PurgeActivity!</string>
-    <string name="app_name">Purge Strikes Back</string>
+	<string name="days">Days to keep:</string>
+	<string name="app_name">Purge Strikes Back</string>
+	<string name="do_it">Purge!</string>
+	<string name="close">Close</string>
+	<string name="call_log">Purge call logs</string>
+	<string name="sms">Purge SMS</string>
+	<string name="locked_sms">Also purge locked SMS</string>
 </resources>
