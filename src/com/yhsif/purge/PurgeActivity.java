@@ -21,7 +21,7 @@ public class PurgeActivity extends Activity
 	}
 
 	// for View.OnClickListener
-	@Override public void onClick(View view) {
+	public void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.close:
 				this.finish();
@@ -53,7 +53,7 @@ public class PurgeActivity extends Activity
 	}
 
 	// for DialogInterface.OnClickListener
-	@Override public void onClick(DialogInterface dialog, int which) {
+	public void onClick(DialogInterface dialog, int which) {
 		CheckBox check = (CheckBox)findViewById(R.id.locked_sms);
 		switch (which){
 			case DialogInterface.BUTTON_POSITIVE:
@@ -66,7 +66,7 @@ public class PurgeActivity extends Activity
 	}
 
 	// for DialogInterface.OnCancelListener
-	@Override public void onCancel(DialogInterface dialog) {
+	public void onCancel(DialogInterface dialog) {
 		((CheckBox)findViewById(R.id.locked_sms)).setChecked(false);
 	}
 
