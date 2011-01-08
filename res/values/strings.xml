@@ -10,4 +10,8 @@
 	<string name="confirm_locked">Are you sure to purge locked SMS, too? They may be locked because you DO want to keep them.</string>
 	<string name="ok">Sure</string>
 	<string name="cancel">No!</string>
+	<string name="nothing">Nothing to purge!</string>
+	<string name="call_deleted" formatted="false">%d call log(s) purged.</string>
+	<string name="sms_deleted" formatted="false">%d SMS purged.</string>
+	<string name="both_deleted" formatted="false">%d call log(s) and %d SMS purged.</string>
 </resources>
