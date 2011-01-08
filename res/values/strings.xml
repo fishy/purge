@@ -7,4 +7,7 @@
 	<string name="call_log">Purge call logs</string>
 	<string name="sms">Purge SMS</string>
 	<string name="locked_sms">Also purge locked SMS</string>
+	<string name="confirm_locked">Are you sure to purge locked SMS, too? They may be locked because you DO want to keep them.</string>
+	<string name="ok">Sure</string>
+	<string name="cancel">No!</string>
 </resources>
