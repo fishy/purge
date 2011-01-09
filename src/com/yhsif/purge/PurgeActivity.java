@@ -76,11 +76,15 @@ public class PurgeActivity extends Activity
 		return ((CheckBox)findViewById(id)).isChecked();
 	}
 
-	protected void purge() {
-		boolean call_log = isChecked(R.id.call_log);
-		boolean sms = isChecked(R.id.sms);
-		boolean locked_sms = isChecked(R.id.locked_sms);
-		int days = getDays();
+	/** 
+	 * Do the purge work.
+	 * 
+	 * @param days days to purge
+	 * @param call_log whether purge call logs or not
+	 * @param sms whether purge sms or not
+	 * @param locked_sms if purge sms, whether purge locked sms or not
+	 */
+	protected void purge(int days, boolean call_log, boolean sms, boolean locked_sms) {
 		int callsDeleted = 0, smsDeleted = 0;
 
 		Time now = new Time();
@@ -155,7 +159,13 @@ public class PurgeActivity extends Activity
 				}
 				return;
 			case R.id.do_it:
-				purge();
+				{
+					int days = getDays();
+					boolean call_log = isChecked(R.id.call_log);
+					boolean sms = isChecked(R.id.sms);
+					boolean locked_sms = isChecked(R.id.locked_sms);
+					purge(days, call_log, sms, locked_sms);
+				}
 				return;
 		}
 	}
