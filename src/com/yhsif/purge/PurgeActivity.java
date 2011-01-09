@@ -27,8 +27,7 @@ public class PurgeActivity extends Activity
 	public static final String KEY_SMS = "sms";
 	public static final String KEY_LOCKED_SMS = "locked_sms";
 
-	public static final Uri SMS_INBOX = Uri.parse("content://sms/inbox");
-	public static final Uri SMS_SENT = Uri.parse("content://sms/sent");
+	public static final Uri SMS_CONTENT_URI = Uri.parse("content://sms");
 	public static final String DATE_FIELD = "date";
 	public static final String LOCKED_FIELD = "locked";
 
@@ -103,18 +102,13 @@ public class PurgeActivity extends Activity
 		}
 
 		if (sms) {
-			// TODO: this didn't works on deletion
-			/*
 			StringBuilder where = new StringBuilder(DATE_FIELD)
 				.append(" < ")
 				.append(time);
 			if (!locked_sms)
 				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
-			smsDeleted += getContentResolver().delete(SMS_INBOX, where.toString(), null);
-			Log.d(TAG, String.format("%d inbox sms deleted", smsDeleted));
-			smsDeleted += getContentResolver().delete(SMS_SENT, where.toString(), null);
-			Log.d(TAG, String.format("%d inbox+sent sms deleted", smsDeleted));
-			*/
+			smsDeleted = getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
+			Log.d(TAG, String.format("%d sms deleted", smsDeleted));
 		}
 
 		String message;
