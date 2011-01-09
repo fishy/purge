@@ -2,13 +2,13 @@ package com.yhsif.purge;
 
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog.Calls;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,12 +18,19 @@ import android.widget.Toast;
 public class PurgeActivity extends Activity
 	implements View.OnClickListener, DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
 
+	public static final String TAG = "purge";
+
 	public static final int DEFAULT_DAYS = 30;
 
 	public static final String KEY_DAYS = "days";
 	public static final String KEY_CALL_LOG = "call_log";
 	public static final String KEY_SMS = "sms";
 	public static final String KEY_LOCKED_SMS = "locked_sms";
+
+	public static final Uri SMS_INBOX = Uri.parse("content://sms/inbox");
+	public static final Uri SMS_SENT = Uri.parse("content://sms/sent");
+	public static final String DATE_FIELD = "date";
+	public static final String LOCKED_FIELD = "locked";
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,6 +91,7 @@ public class PurgeActivity extends Activity
 		now.second = 0;
 		now.monthDay -= days;
 		long time = now.toMillis(true);
+		Log.d(TAG, String.format("deletion timestamp = %d", time));
 
 		if (call_log) {
 			String where = new StringBuilder(Calls.DATE)
@@ -91,6 +99,22 @@ public class PurgeActivity extends Activity
 				.append(time)
 				.toString();
 			callsDeleted = getContentResolver().delete(Calls.CONTENT_URI, where, null);
+			Log.d(TAG, String.format("%d call logs deleted", callsDeleted));
+		}
+
+		if (sms) {
+			// TODO: this didn't works on deletion
+			/*
+			StringBuilder where = new StringBuilder(DATE_FIELD)
+				.append(" < ")
+				.append(time);
+			if (!locked_sms)
+				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
+			smsDeleted += getContentResolver().delete(SMS_INBOX, where.toString(), null);
+			Log.d(TAG, String.format("%d inbox sms deleted", smsDeleted));
+			smsDeleted += getContentResolver().delete(SMS_SENT, where.toString(), null);
+			Log.d(TAG, String.format("%d inbox+sent sms deleted", smsDeleted));
+			*/
 		}
 
 		String message;
