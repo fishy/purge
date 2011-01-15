@@ -19,8 +19,7 @@ public class AutoPurge extends BroadcastReceiver {
 	public static int SECOND = 0;
 
 	@Override public void onReceive(Context context, Intent intent) {
-		if (intent.getAction() == null ||
-				!intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+		if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
 			SharedPreferences setting = context.getSharedPreferences(PurgeActivity.PREF, 0);
 			if (!setting.getBoolean(PurgeActivity.KEY_AUTO_ENABLED, false)) {
 				Log.e(PurgeActivity.TAG, "onReceive: auto purge disabled!");

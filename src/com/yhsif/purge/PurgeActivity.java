@@ -287,9 +287,9 @@ public class PurgeActivity extends TabActivity
 	// for DialogInterface.OnClickListener
 	public void onClick(DialogInterface dialog, int which) {
 		CheckBox check = null;
-		if(lastTab.equals(TAB_ONCE))
+		if(TAB_ONCE.equals(lastTab))
 			check = (CheckBox)findViewById(R.id.locked_sms);
-		else if(lastTab.equals(TAB_AUTO))
+		else if(TAB_AUTO.equals(lastTab))
 			check = (CheckBox)findViewById(R.id.auto_locked_sms);
 		else
 			return;
@@ -306,9 +306,9 @@ public class PurgeActivity extends TabActivity
 
 	// for DialogInterface.OnCancelListener
 	public void onCancel(DialogInterface dialog) {
-		if(lastTab.equals(TAB_ONCE))
+		if(TAB_ONCE.equals(lastTab))
 			((CheckBox)findViewById(R.id.locked_sms)).setChecked(false);
-		else if(lastTab.equals(TAB_AUTO))
+		else if(TAB_AUTO.equals(lastTab))
 			((CheckBox)findViewById(R.id.auto_locked_sms)).setChecked(false);
 	}
 
