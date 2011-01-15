@@ -2,6 +2,7 @@ package com.yhsif.purge;
 
 import android.app.AlertDialog.Builder;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -25,6 +26,7 @@ public class PurgeActivity extends TabActivity
 		   TabHost.OnTabChangeListener {
 
 	public static final String TAG = "purge";
+	public static final String PREF = "com.yhsif.purge";
 
 	public static final int DEFAULT_DAYS = 30;
 
@@ -75,10 +77,10 @@ public class PurgeActivity extends TabActivity
 
 		tabHost.setCurrentTabByTag(DEFAULT_TAB);
 
-		SharedPreferences settings = getPreferences(0);
+		SharedPreferences settings = getSharedPreferences(PREF, 0);
 
 		((EditText)findViewById(R.id.days))
-			.setText(Long.toString(settings.getLong(KEY_DAYS, DEFAULT_DAYS)));
+			.setText(Integer.toString(settings.getInt(KEY_DAYS, DEFAULT_DAYS)));
 		((CheckBox)findViewById(R.id.call_log))
 			.setChecked(settings.getBoolean(KEY_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.sms))
@@ -89,7 +91,7 @@ public class PurgeActivity extends TabActivity
 			.setChecked(settings.getBoolean(KEY_LOCKED_SMS, false));
 
 		((EditText)findViewById(R.id.auto_days))
-			.setText(Long.toString(settings.getLong(KEY_AUTO_DAYS, DEFAULT_DAYS)));
+			.setText(Integer.toString(settings.getInt(KEY_AUTO_DAYS, DEFAULT_DAYS)));
 		((CheckBox)findViewById(R.id.auto_call_log))
 			.setChecked(settings.getBoolean(KEY_AUTO_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.auto_sms))
@@ -115,15 +117,15 @@ public class PurgeActivity extends TabActivity
 	@Override public void onPause() {
 		super.onPause();
 
-		SharedPreferences settings = getPreferences(0);
+		SharedPreferences settings = getSharedPreferences(PREF, 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-		editor.putLong(KEY_DAYS, getDays(R.id.days));
+		editor.putInt(KEY_DAYS, getDays(R.id.days));
 		editor.putBoolean(KEY_CALL_LOG, isChecked(R.id.call_log));
 		editor.putBoolean(KEY_SMS, isChecked(R.id.sms));
 		editor.putBoolean(KEY_LOCKED_SMS, isChecked(R.id.locked_sms));
 
-		editor.putLong(KEY_AUTO_DAYS, getDays(R.id.auto_days));
+		editor.putInt(KEY_AUTO_DAYS, getDays(R.id.auto_days));
 		editor.putBoolean(KEY_AUTO_CALL_LOG, isChecked(R.id.auto_call_log));
 		editor.putBoolean(KEY_AUTO_SMS, isChecked(R.id.auto_sms));
 		editor.putBoolean(KEY_AUTO_LOCKED_SMS, isChecked(R.id.auto_locked_sms));
@@ -155,13 +157,19 @@ public class PurgeActivity extends TabActivity
 	/** 
 	 * Do the purge work.
 	 * 
+	 * @param context the context
 	 * @param days days to purge
 	 * @param call_log whether purge call logs or not
 	 * @param sms whether purge sms or not
 	 * @param locked_sms if purge sms, whether purge locked sms or not
 	 */
-	protected void purge(int days, boolean call_log, boolean sms, boolean locked_sms) {
+	public static void purge(Context context, int days, boolean call_log, boolean sms, boolean locked_sms) {
 		int callsDeleted = 0, smsDeleted = 0;
+
+		if (days <= 0) {
+			Log.e(TAG, String.format("purge: days is %d", days));
+			return;
+		}
 
 		Time now = new Time();
 		now.setToNow();
@@ -177,7 +185,7 @@ public class PurgeActivity extends TabActivity
 				.append(" < ")
 				.append(time)
 				.toString();
-			callsDeleted = getContentResolver().delete(Calls.CONTENT_URI, where, null);
+			callsDeleted = context.getContentResolver().delete(Calls.CONTENT_URI, where, null);
 			Log.d(TAG, String.format("%d call logs deleted", callsDeleted));
 		}
 
@@ -187,7 +195,7 @@ public class PurgeActivity extends TabActivity
 				.append(time);
 			if(!locked_sms)
 				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
-			smsDeleted = getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
+			smsDeleted = context.getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
 			Log.d(TAG, String.format("%d sms deleted", smsDeleted));
 		}
 
@@ -196,19 +204,20 @@ public class PurgeActivity extends TabActivity
 		if(call_log)
 			if(sms)
 				// both
-				message = String.format(getString(R.string.both_deleted), callsDeleted, smsDeleted);
+				message = String.format(context.getString(R.string.both_deleted), callsDeleted, smsDeleted);
 			else
 				// only calls
-				message = String.format(getString(R.string.call_deleted), callsDeleted);
+				message = String.format(context.getString(R.string.call_deleted), callsDeleted);
 		else
 			if(sms)
 				// only sms
-				message = String.format(getString(R.string.sms_deleted), smsDeleted);
+				message = String.format(context.getString(R.string.sms_deleted), smsDeleted);
 			else
 				// neither
-				message = getString(R.string.nothing);
+				message = context.getString(R.string.nothing);
 
-		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+		Log.i(TAG, message);
 	}
 
 	// for View.OnClickListener
@@ -257,16 +266,18 @@ public class PurgeActivity extends TabActivity
 					boolean call_log = isChecked(R.id.call_log);
 					boolean sms = isChecked(R.id.sms);
 					boolean locked_sms = isChecked(R.id.locked_sms);
-					purge(days, call_log, sms, locked_sms);
+					purge(this, days, call_log, sms, locked_sms);
 				}
 				return;
 			case R.id.set_auto:
 				autoSet = true;
 				setStatusText();
+				AutoPurge.registerAlarm(this);
 				return;
 			case R.id.unset_auto:
 				autoSet = false;
 				setStatusText();
+				AutoPurge.unregisterAlarm(this);
 				return;
 		}
 	}
