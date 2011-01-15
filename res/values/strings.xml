@@ -14,4 +14,11 @@
 	<string name="call_deleted" formatted="false">%d call log(s) purged.</string>
 	<string name="sms_deleted" formatted="false">%d SMS purged.</string>
 	<string name="both_deleted" formatted="false">%d call log(s) and %d SMS purged.</string>
+	<string name="tab_once">Purge</string>
+	<string name="tab_auto">Auto Purge</string>
+	<string name="set_auto">Set</string>
+	<string name="unset_auto">Disable</string>
+	<string name="auto_status" formatted="false">Status: %s.</string>
+	<string name="auto_status_set">auto purge at every midnight (00:05)</string>
+	<string name="auto_status_unset">auto purge disabled</string>
 </resources>

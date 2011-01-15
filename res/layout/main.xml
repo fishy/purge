@@ -1,119 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	>
-<LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	android:padding="5dp">
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:padding="5dp">
-		<TextView  
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
-			android:text="@string/days"
-			android:paddingRight="5dp"
-			/>
-		<EditText
-			android:id="@+id/days"
-			android:text="30"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:numeric="integer"
-			/>
-	</LinearLayout>
-	<View
-		android:layout_width="fill_parent"
-		android:layout_height="1dp"
-		android:background="@drawable/divider_horizontal_dark"
-		/>
-</LinearLayout>
-<LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	android:padding="5dp">
-	<CheckBox
-		android:id="@+id/call_log"
-		android:text="@string/call_log"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp"
-		android:paddingBottom="5dp"
-		android:checked="true"
-		/>
-	<View
-		android:layout_width="fill_parent"
-		android:layout_height="1dp"
-		android:background="@drawable/divider_horizontal_dark"
-		/>
-</LinearLayout>
-<LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical"
-	android:padding="5dp">
-	<CheckBox
-		android:id="@+id/sms"
-		android:text="@string/sms"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="5dp"
-		android:checked="true"
-		/>
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:paddingBottom="5dp">
-		<View
-			android:layout_width="30dp"
-			android:layout_height="fill_parent"
-			/>
-		<CheckBox
-			android:id="@+id/locked_sms"
-			android:text="@string/locked_sms"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:checked="false"
-			/>
-	</LinearLayout>
-	<View
-		android:layout_width="fill_parent"
-		android:layout_height="1dp"
-		android:background="@drawable/divider_horizontal_dark"
-		/>
-</LinearLayout>
-<LinearLayout
-	android:gravity="bottom"
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@android:id/tabhost"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	<LinearLayout
+		android:orientation="vertical"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:gravity="center">
-		
-		<Button
-			android:id="@+id/do_it"
-			android:text="@string/do_it"
-			android:layout_width="100dp"
-			android:layout_height="wrap_content"
-			/>
-		<Button
-			android:text="@string/close"
-			android:id="@+id/close"
-			android:layout_width="100dp"
-			android:layout_height="wrap_content"
-			/>
-</LinearLayout>
-
-</LinearLayout>
-
-</LinearLayout>
+		android:layout_height="fill_parent"
+		android:padding="5dp">
+		<TabWidget
+			android:id="@android:id/tabs"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" />
+		<FrameLayout
+			android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:padding="5dp" />
+	</LinearLayout>
+</TabHost>

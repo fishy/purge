@@ -1,7 +1,7 @@
 package com.yhsif.purge;
 
-import android.app.Activity;
 import android.app.AlertDialog.Builder;
+import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -9,14 +9,20 @@ import android.os.Bundle;
 import android.provider.CallLog.Calls;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class PurgeActivity extends Activity
-	implements View.OnClickListener, DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+public class PurgeActivity extends TabActivity
+	implements View.OnClickListener,
+		   DialogInterface.OnClickListener,
+		   DialogInterface.OnCancelListener,
+		   TabHost.OnTabChangeListener {
 
 	public static final String TAG = "purge";
 
@@ -27,15 +33,50 @@ public class PurgeActivity extends Activity
 	public static final String KEY_SMS = "sms";
 	public static final String KEY_LOCKED_SMS = "locked_sms";
 
+	public static final String KEY_AUTO_DAYS = "auto_days";
+	public static final String KEY_AUTO_CALL_LOG = "auto_call_log";
+	public static final String KEY_AUTO_SMS = "auto_sms";
+	public static final String KEY_AUTO_LOCKED_SMS = "auto_locked_sms";
+	public static final String KEY_AUTO_ENABLED = "auto_enabled";
+
 	public static final Uri SMS_CONTENT_URI = Uri.parse("content://sms");
 	public static final String DATE_FIELD = "date";
 	public static final String LOCKED_FIELD = "locked";
+
+	// Tab tags
+	public static final String TAB_ONCE = "once";
+	public static final String TAB_AUTO = "auto";
+	public static final String DEFAULT_TAB = TAB_ONCE;
+
+	protected String lastTab = "";
+	protected boolean autoSet = false;
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		TabHost tabHost = getTabHost();
+		TabHost.TabSpec spec;
+		tabHost.setOnTabChangedListener(this);
+
+		LayoutInflater inflater = LayoutInflater.from(this);
+		inflater.inflate(R.layout.once, getTabHost().getTabContentView());
+		inflater.inflate(R.layout.auto, getTabHost().getTabContentView());
+
+		spec = tabHost.newTabSpec(TAB_ONCE)
+			.setIndicator(getString(R.string.tab_once))
+			.setContent(R.id.layout_once);
+		tabHost.addTab(spec);
+
+		spec = tabHost.newTabSpec(TAB_AUTO)
+			.setIndicator(getString(R.string.tab_auto))
+			.setContent(R.id.layout_auto);
+		tabHost.addTab(spec);
+
+		tabHost.setCurrentTabByTag(DEFAULT_TAB);
+
 		SharedPreferences settings = getPreferences(0);
+
 		((EditText)findViewById(R.id.days))
 			.setText(Long.toString(settings.getLong(KEY_DAYS, DEFAULT_DAYS)));
 		((CheckBox)findViewById(R.id.call_log))
@@ -47,26 +88,53 @@ public class PurgeActivity extends Activity
 		((CheckBox)findViewById(R.id.locked_sms))
 			.setChecked(settings.getBoolean(KEY_LOCKED_SMS, false));
 
+		((EditText)findViewById(R.id.auto_days))
+			.setText(Long.toString(settings.getLong(KEY_AUTO_DAYS, DEFAULT_DAYS)));
+		((CheckBox)findViewById(R.id.auto_call_log))
+			.setChecked(settings.getBoolean(KEY_AUTO_CALL_LOG, true));
+		((CheckBox)findViewById(R.id.auto_sms))
+			.setChecked(settings.getBoolean(KEY_AUTO_SMS, true));
+		((CheckBox)findViewById(R.id.auto_locked_sms))
+			.setEnabled(settings.getBoolean(KEY_AUTO_SMS, true));
+		((CheckBox)findViewById(R.id.auto_locked_sms))
+			.setChecked(settings.getBoolean(KEY_AUTO_LOCKED_SMS, false));
+		autoSet = settings.getBoolean(KEY_AUTO_ENABLED, false);
+		setStatusText();
+
 		((Button)findViewById(R.id.do_it)).setOnClickListener(this);
 		((Button)findViewById(R.id.close)).setOnClickListener(this);
 		((CheckBox)findViewById(R.id.sms)).setOnClickListener(this);
 		((CheckBox)findViewById(R.id.locked_sms)).setOnClickListener(this);
+
+		((Button)findViewById(R.id.set_auto)).setOnClickListener(this);
+		((Button)findViewById(R.id.unset_auto)).setOnClickListener(this);
+		((CheckBox)findViewById(R.id.auto_sms)).setOnClickListener(this);
+		((CheckBox)findViewById(R.id.auto_locked_sms)).setOnClickListener(this);
 	}
 
 	@Override public void onStop() {
 		super.onStop();
+
 		SharedPreferences settings = getPreferences(0);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putLong(KEY_DAYS, getDays());
+
+		editor.putLong(KEY_DAYS, getDays(R.id.days));
 		editor.putBoolean(KEY_CALL_LOG, isChecked(R.id.call_log));
 		editor.putBoolean(KEY_SMS, isChecked(R.id.sms));
 		editor.putBoolean(KEY_LOCKED_SMS, isChecked(R.id.locked_sms));
+
+		editor.putLong(KEY_AUTO_DAYS, getDays(R.id.auto_days));
+		editor.putBoolean(KEY_AUTO_CALL_LOG, isChecked(R.id.auto_call_log));
+		editor.putBoolean(KEY_AUTO_SMS, isChecked(R.id.auto_sms));
+		editor.putBoolean(KEY_AUTO_LOCKED_SMS, isChecked(R.id.auto_locked_sms));
+		editor.putBoolean(KEY_AUTO_ENABLED, autoSet);
+
 		editor.commit();
 	}
 
-	protected int getDays() {
+	protected int getDays(int id) {
 		try {
-			return Integer.parseInt(((EditText)findViewById(R.id.days)).getText().toString());
+			return Integer.parseInt(((EditText)findViewById(id)).getText().toString());
 		} catch (NumberFormatException e) {
 			return 0;
 		}
@@ -74,6 +142,14 @@ public class PurgeActivity extends Activity
 
 	protected boolean isChecked(int id) {
 		return ((CheckBox)findViewById(id)).isChecked();
+	}
+
+	protected void setStatusText() {
+		String status = autoSet ?
+			getString(R.string.auto_status_set) :
+			getString(R.string.auto_status_unset);
+		((TextView)findViewById(R.id.auto_status))
+			.setText(String.format(getString(R.string.auto_status, status)));
 	}
 
 	/** 
@@ -96,7 +172,7 @@ public class PurgeActivity extends Activity
 		long time = now.toMillis(true);
 		Log.d(TAG, String.format("deletion timestamp = %d", time));
 
-		if (call_log) {
+		if(call_log) {
 			String where = new StringBuilder(Calls.DATE)
 				.append(" < ")
 				.append(time)
@@ -105,11 +181,11 @@ public class PurgeActivity extends Activity
 			Log.d(TAG, String.format("%d call logs deleted", callsDeleted));
 		}
 
-		if (sms) {
+		if(sms) {
 			StringBuilder where = new StringBuilder(DATE_FIELD)
 				.append(" < ")
 				.append(time);
-			if (!locked_sms)
+			if(!locked_sms)
 				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
 			smsDeleted = getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
 			Log.d(TAG, String.format("%d sms deleted", smsDeleted));
@@ -117,15 +193,15 @@ public class PurgeActivity extends Activity
 
 		String message;
 
-		if (call_log)
-			if (sms)
+		if(call_log)
+			if(sms)
 				// both
 				message = String.format(getString(R.string.both_deleted), callsDeleted, smsDeleted);
 			else
 				// only calls
 				message = String.format(getString(R.string.call_deleted), callsDeleted);
 		else
-			if (sms)
+			if(sms)
 				// only sms
 				message = String.format(getString(R.string.sms_deleted), smsDeleted);
 			else
@@ -158,21 +234,53 @@ public class PurgeActivity extends Activity
 						.show();
 				}
 				return;
+			case R.id.auto_sms:
+				((CheckBox)findViewById(R.id.auto_locked_sms)).setEnabled(isChecked(R.id.auto_sms));
+				return;
+			case R.id.auto_locked_sms:
+				{
+					if(!isChecked(R.id.auto_locked_sms)) {
+						// do nothing
+						return;
+					}
+					Builder builder = new Builder(this);
+					builder.setMessage(R.string.confirm_locked)
+						.setOnCancelListener(this)
+						.setPositiveButton(R.string.ok, this)
+						.setNegativeButton(R.string.cancel, this)
+						.show();
+				}
+				return;
 			case R.id.do_it:
 				{
-					int days = getDays();
+					int days = getDays(R.id.days);
 					boolean call_log = isChecked(R.id.call_log);
 					boolean sms = isChecked(R.id.sms);
 					boolean locked_sms = isChecked(R.id.locked_sms);
 					purge(days, call_log, sms, locked_sms);
 				}
 				return;
+			case R.id.set_auto:
+				autoSet = true;
+				setStatusText();
+				return;
+			case R.id.unset_auto:
+				autoSet = false;
+				setStatusText();
+				return;
 		}
 	}
 
 	// for DialogInterface.OnClickListener
 	public void onClick(DialogInterface dialog, int which) {
-		CheckBox check = (CheckBox)findViewById(R.id.locked_sms);
+		CheckBox check = null;
+		if(lastTab.equals(TAB_ONCE))
+			check = (CheckBox)findViewById(R.id.locked_sms);
+		else if(lastTab.equals(TAB_AUTO))
+			check = (CheckBox)findViewById(R.id.auto_locked_sms);
+		else
+			return;
+
 		switch (which){
 			case DialogInterface.BUTTON_POSITIVE:
 				check.setChecked(true);
@@ -185,7 +293,16 @@ public class PurgeActivity extends Activity
 
 	// for DialogInterface.OnCancelListener
 	public void onCancel(DialogInterface dialog) {
-		((CheckBox)findViewById(R.id.locked_sms)).setChecked(false);
+		if(lastTab.equals(TAB_ONCE))
+			((CheckBox)findViewById(R.id.locked_sms)).setChecked(false);
+		else if(lastTab.equals(TAB_AUTO))
+			((CheckBox)findViewById(R.id.auto_locked_sms)).setChecked(false);
+	}
+
+	// for TabHost.OnTabChangeListener
+	public void onTabChanged(String tabId) {
+		Log.d(TAG, String.format("tab changed from %s to %s", lastTab, tabId));
+		lastTab = tabId;
 	}
 
 }
