@@ -112,8 +112,8 @@ public class PurgeActivity extends TabActivity
 		((CheckBox)findViewById(R.id.auto_locked_sms)).setOnClickListener(this);
 	}
 
-	@Override public void onStop() {
-		super.onStop();
+	@Override public void onPause() {
+		super.onPause();
 
 		SharedPreferences settings = getPreferences(0);
 		SharedPreferences.Editor editor = settings.edit();
