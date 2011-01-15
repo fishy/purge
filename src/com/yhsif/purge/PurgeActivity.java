@@ -152,6 +152,10 @@ public class PurgeActivity extends TabActivity
 			getString(R.string.auto_status_unset);
 		((TextView)findViewById(R.id.auto_status))
 			.setText(String.format(getString(R.string.auto_status, status)));
+		if (autoSet)
+			AutoPurge.registerAlarm(this);
+		else
+			AutoPurge.unregisterAlarm(this);
 	}
 
 	/** 
@@ -272,12 +276,10 @@ public class PurgeActivity extends TabActivity
 			case R.id.set_auto:
 				autoSet = true;
 				setStatusText();
-				AutoPurge.registerAlarm(this);
 				return;
 			case R.id.unset_auto:
 				autoSet = false;
 				setStatusText();
-				AutoPurge.unregisterAlarm(this);
 				return;
 		}
 	}

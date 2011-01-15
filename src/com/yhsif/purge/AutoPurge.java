@@ -8,14 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Map;
 
 public class AutoPurge extends BroadcastReceiver {
-
-	// 24 hours for alarm interval
-	public static long ALARM_INTERVAL = 24*60*60*1000;
 
 	// alarm at 00:05:00 everyday
 	public static int HOUR = 0;
@@ -23,7 +19,8 @@ public class AutoPurge extends BroadcastReceiver {
 	public static int SECOND = 0;
 
 	@Override public void onReceive(Context context, Intent intent) {
-		if (!intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+		if (intent.getAction() == null ||
+				!intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
 			SharedPreferences setting = context.getSharedPreferences(PurgeActivity.PREF, 0);
 			if (!setting.getBoolean(PurgeActivity.KEY_AUTO_ENABLED, false)) {
 				Log.e(PurgeActivity.TAG, "onReceive: auto purge disabled!");
@@ -48,9 +45,6 @@ public class AutoPurge extends BroadcastReceiver {
 	}
 
 	public static void registerAlarm(Context context) {
-		Time now = new Time();
-		now.setToNow();
-
 		Time fire = new Time();
 		fire.setToNow();
 		fire.hour = HOUR;
@@ -60,19 +54,18 @@ public class AutoPurge extends BroadcastReceiver {
 		if (fire.toMillis(true) <= System.currentTimeMillis())
 			fire.monthDay++;
 
-		AlarmManager alarm = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
+		long time = fire.toMillis(true);
+
+		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		// One day is not always 24 hours (consider DST), so we use set instead of setRepeating,
 		// and set the next alarm in onReceive.
-		alarm.set(AlarmManager.RTC_WAKEUP,
-				fire.toMillis(true),
-				getSender(context));
+		alarm.set(AlarmManager.RTC_WAKEUP, time, getSender(context));
 
-		Log.d(PurgeActivity.TAG, "registered!");
-		Toast.makeText(context, "registered!", Toast.LENGTH_SHORT).show();
+		Log.d(PurgeActivity.TAG, String.format("registered alarm with time %d", time));
 	}
 
 	public static void unregisterAlarm(Context context) {
-		AlarmManager alarm = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
+		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarm.cancel(getSender(context));
 	}
 
