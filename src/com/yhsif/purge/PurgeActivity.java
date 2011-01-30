@@ -138,7 +138,7 @@ public class PurgeActivity extends TabActivity
 		try {
 			return Integer.parseInt(((EditText)findViewById(id)).getText().toString());
 		} catch (NumberFormatException e) {
-			return 0;
+			return DEFAULT_DAYS;
 		}
 	}
 
