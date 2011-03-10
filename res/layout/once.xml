@@ -7,8 +7,8 @@
 	>
 	<ScrollView
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="55dp"
+		android:layout_height="fill_parent"
+		android:layout_weight="1"
 		>
 		<LinearLayout
 			android:layout_width="fill_parent"
@@ -119,35 +119,26 @@
 	</ScrollView>
 
 	<LinearLayout
-		android:gravity="bottom"
-		android:layout_marginTop="-55dp"
+		android:background="@android:drawable/bottom_bar"
+		android:padding="5dp"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
-		<LinearLayout
-			android:background="@android:drawable/bottom_bar"
-			android:paddingTop="5dp"
-			android:paddingLeft="4dp"
-			android:paddingRight="4dp"
-			android:paddingBottom="1dp"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center">
+		<Button
+			android:id="@+id/do_it"
+			android:text="@string/do_it"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center">
-			<Button
-				android:id="@+id/do_it"
-				android:text="@string/do_it"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="0.5"
-				/>
-			<Button
-				android:text="@string/close"
-				android:id="@+id/close"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="0.5"
-				/>
-		</LinearLayout>
+			android:layout_weight="0.5"
+			/>
+		<Button
+			android:text="@string/close"
+			android:id="@+id/close"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.5"
+			/>
 	</LinearLayout>
 
 </LinearLayout>
