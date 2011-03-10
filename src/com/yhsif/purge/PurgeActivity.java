@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog.Calls;
 import android.text.format.Time;
@@ -85,8 +86,11 @@ public class PurgeActivity extends TabActivity
 			.setChecked(settings.getBoolean(KEY_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.sms))
 			.setChecked(settings.getBoolean(KEY_SMS, true));
-		((CheckBox)findViewById(R.id.locked_sms))
-			.setEnabled(settings.getBoolean(KEY_SMS, true));
+		if(hasLock())
+			((CheckBox)findViewById(R.id.locked_sms))
+				.setEnabled(settings.getBoolean(KEY_SMS, true));
+		else
+			((CheckBox)findViewById(R.id.locked_sms)).setEnabled(false);
 		((CheckBox)findViewById(R.id.locked_sms))
 			.setChecked(settings.getBoolean(KEY_LOCKED_SMS, false));
 
@@ -96,8 +100,11 @@ public class PurgeActivity extends TabActivity
 			.setChecked(settings.getBoolean(KEY_AUTO_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.auto_sms))
 			.setChecked(settings.getBoolean(KEY_AUTO_SMS, true));
-		((CheckBox)findViewById(R.id.auto_locked_sms))
-			.setEnabled(settings.getBoolean(KEY_AUTO_SMS, true));
+		if(hasLock())
+			((CheckBox)findViewById(R.id.auto_locked_sms))
+				.setEnabled(settings.getBoolean(KEY_AUTO_SMS, true));
+		else
+			((CheckBox)findViewById(R.id.auto_locked_sms)).setEnabled(false);
 		((CheckBox)findViewById(R.id.auto_locked_sms))
 			.setChecked(settings.getBoolean(KEY_AUTO_LOCKED_SMS, false));
 		autoSet = settings.getBoolean(KEY_AUTO_ENABLED, false);
@@ -158,6 +165,15 @@ public class PurgeActivity extends TabActivity
 			AutoPurge.unregisterAlarm(this);
 	}
 
+	/**
+	 * Do we have locked messages feature?
+	 *
+	 * @return true if we are at least 2.0, false otherwise
+	 */
+	public static boolean hasLock() {
+		return Build.VERSION.SDK_INT > Build.VERSION_CODES.DONUT;
+	}
+
 	/** 
 	 * Do the purge work.
 	 * 
@@ -197,7 +213,7 @@ public class PurgeActivity extends TabActivity
 			StringBuilder where = new StringBuilder(DATE_FIELD)
 				.append(" < ")
 				.append(time);
-			if(!locked_sms)
+			if(!locked_sms && hasLock())
 				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
 			smsDeleted = context.getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
 			Log.d(TAG, String.format("%d sms deleted", smsDeleted));
@@ -231,7 +247,11 @@ public class PurgeActivity extends TabActivity
 				this.finish();
 				return;
 			case R.id.sms:
-				((CheckBox)findViewById(R.id.locked_sms)).setEnabled(isChecked(R.id.sms));
+				if(hasLock())
+					((CheckBox)findViewById(R.id.locked_sms))
+						.setEnabled(isChecked(R.id.sms));
+				else
+					((CheckBox)findViewById(R.id.locked_sms)).setEnabled(false);
 				return;
 			case R.id.locked_sms:
 				{
@@ -248,7 +268,11 @@ public class PurgeActivity extends TabActivity
 				}
 				return;
 			case R.id.auto_sms:
-				((CheckBox)findViewById(R.id.auto_locked_sms)).setEnabled(isChecked(R.id.auto_sms));
+				if(hasLock())
+					((CheckBox)findViewById(R.id.auto_locked_sms))
+						.setEnabled(isChecked(R.id.auto_sms));
+				else
+					((CheckBox)findViewById(R.id.auto_locked_sms)).setEnabled(false);
 				return;
 			case R.id.auto_locked_sms:
 				{
