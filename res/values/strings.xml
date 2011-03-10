@@ -6,14 +6,13 @@
 	<string name="close">Close</string>
 	<string name="call_log">Purge call logs</string>
 	<string name="sms">Purge SMS</string>
+	<string name="mms">And MMS, too</string>
 	<string name="locked_sms">Also purge locked SMS</string>
 	<string name="confirm_locked">Are you sure to purge locked SMS, too? They may be locked because you DO want to keep them.</string>
 	<string name="ok">Sure</string>
 	<string name="cancel">No!</string>
 	<string name="nothing">Nothing to purge!</string>
-	<string name="call_deleted" formatted="false">%d call log(s) purged.</string>
-	<string name="sms_deleted" formatted="false">%d SMS purged.</string>
-	<string name="both_deleted" formatted="false">%d call log(s) and %d SMS purged.</string>
+	<string name="msg_deleted" formatted="false">%d call log(s), %d SMS and %d MMS purged.</string>
 	<string name="tab_once">Purge</string>
 	<string name="tab_auto">Auto Purge</string>
 	<string name="set_auto">Set</string>

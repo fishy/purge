@@ -96,6 +96,23 @@
 			android:layout_height="fill_parent"
 			/>
 		<CheckBox
+			android:id="@+id/auto_mms"
+			android:text="@string/mms"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:checked="false"
+			/>
+	</LinearLayout>
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingBottom="5dp">
+		<View
+			android:layout_width="30dp"
+			android:layout_height="fill_parent"
+			/>
+		<CheckBox
 			android:id="@+id/auto_locked_sms"
 			android:text="@string/locked_sms"
 			android:layout_width="fill_parent"

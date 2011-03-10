@@ -29,12 +29,14 @@ public class AutoPurge extends BroadcastReceiver {
 			if (values.containsKey(PurgeActivity.KEY_AUTO_DAYS) &&
 					values.containsKey(PurgeActivity.KEY_AUTO_CALL_LOG) &&
 					values.containsKey(PurgeActivity.KEY_AUTO_SMS) &&
+					values.containsKey(PurgeActivity.KEY_AUTO_MMS) &&
 					values.containsKey(PurgeActivity.KEY_AUTO_LOCKED_SMS)) {
 				int days = setting.getInt(PurgeActivity.KEY_AUTO_DAYS, -1);
 				boolean call = setting.getBoolean(PurgeActivity.KEY_AUTO_CALL_LOG, true);
 				boolean sms = setting.getBoolean(PurgeActivity.KEY_AUTO_SMS, true);
+				boolean mms = setting.getBoolean(PurgeActivity.KEY_AUTO_MMS, true);
 				boolean locked = setting.getBoolean(PurgeActivity.KEY_AUTO_LOCKED_SMS, false);
-				PurgeActivity.purge(context, days, call, sms, locked);
+				PurgeActivity.purge(context, days, call, sms, mms, locked);
 			} else {
 				Log.e(PurgeActivity.TAG, "onReceive: settings missing.");
 			}

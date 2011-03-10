@@ -34,15 +34,18 @@ public class PurgeActivity extends TabActivity
 	public static final String KEY_DAYS = "days";
 	public static final String KEY_CALL_LOG = "call_log";
 	public static final String KEY_SMS = "sms";
+	public static final String KEY_MMS = "mms";
 	public static final String KEY_LOCKED_SMS = "locked_sms";
 
 	public static final String KEY_AUTO_DAYS = "auto_days";
 	public static final String KEY_AUTO_CALL_LOG = "auto_call_log";
 	public static final String KEY_AUTO_SMS = "auto_sms";
+	public static final String KEY_AUTO_MMS = "auto_mms";
 	public static final String KEY_AUTO_LOCKED_SMS = "auto_locked_sms";
 	public static final String KEY_AUTO_ENABLED = "auto_enabled";
 
 	public static final Uri SMS_CONTENT_URI = Uri.parse("content://sms");
+	public static final Uri MMS_CONTENT_URI = Uri.parse("content://mms");
 	public static final String DATE_FIELD = "date";
 	public static final String LOCKED_FIELD = "locked";
 
@@ -86,6 +89,10 @@ public class PurgeActivity extends TabActivity
 			.setChecked(settings.getBoolean(KEY_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.sms))
 			.setChecked(settings.getBoolean(KEY_SMS, true));
+		((CheckBox)findViewById(R.id.mms))
+			.setEnabled(settings.getBoolean(KEY_SMS, true));
+		((CheckBox)findViewById(R.id.mms))
+			.setChecked(settings.getBoolean(KEY_MMS, true));
 		if(hasLock())
 			((CheckBox)findViewById(R.id.locked_sms))
 				.setEnabled(settings.getBoolean(KEY_SMS, true));
@@ -100,6 +107,10 @@ public class PurgeActivity extends TabActivity
 			.setChecked(settings.getBoolean(KEY_AUTO_CALL_LOG, true));
 		((CheckBox)findViewById(R.id.auto_sms))
 			.setChecked(settings.getBoolean(KEY_AUTO_SMS, true));
+		((CheckBox)findViewById(R.id.auto_mms))
+			.setEnabled(settings.getBoolean(KEY_AUTO_SMS, true));
+		((CheckBox)findViewById(R.id.auto_mms))
+			.setChecked(settings.getBoolean(KEY_AUTO_MMS, true));
 		if(hasLock())
 			((CheckBox)findViewById(R.id.auto_locked_sms))
 				.setEnabled(settings.getBoolean(KEY_AUTO_SMS, true));
@@ -130,11 +141,13 @@ public class PurgeActivity extends TabActivity
 		editor.putInt(KEY_DAYS, getDays(R.id.days));
 		editor.putBoolean(KEY_CALL_LOG, isChecked(R.id.call_log));
 		editor.putBoolean(KEY_SMS, isChecked(R.id.sms));
+		editor.putBoolean(KEY_MMS, isChecked(R.id.mms));
 		editor.putBoolean(KEY_LOCKED_SMS, isChecked(R.id.locked_sms));
 
 		editor.putInt(KEY_AUTO_DAYS, getDays(R.id.auto_days));
 		editor.putBoolean(KEY_AUTO_CALL_LOG, isChecked(R.id.auto_call_log));
 		editor.putBoolean(KEY_AUTO_SMS, isChecked(R.id.auto_sms));
+		editor.putBoolean(KEY_AUTO_MMS, isChecked(R.id.auto_mms));
 		editor.putBoolean(KEY_AUTO_LOCKED_SMS, isChecked(R.id.auto_locked_sms));
 		editor.putBoolean(KEY_AUTO_ENABLED, autoSet);
 
@@ -181,10 +194,16 @@ public class PurgeActivity extends TabActivity
 	 * @param days days to purge
 	 * @param call_log whether purge call logs or not
 	 * @param sms whether purge sms or not
+	 * @param mms whether purge mms or not
 	 * @param locked_sms if purge sms, whether purge locked sms or not
 	 */
-	public static void purge(Context context, int days, boolean call_log, boolean sms, boolean locked_sms) {
-		int callsDeleted = 0, smsDeleted = 0;
+	public static void purge(Context context,
+			int days,
+			boolean call_log,
+			boolean sms,
+			boolean mms,
+			boolean locked_sms) {
+		int callsDeleted = 0, smsDeleted = 0, mmsDeleted = 0;
 
 		if (days <= 0) {
 			Log.e(TAG, String.format("purge: days is %d", days));
@@ -217,24 +236,15 @@ public class PurgeActivity extends TabActivity
 				where.append(" AND ").append(LOCKED_FIELD).append(" = 0");
 			smsDeleted = context.getContentResolver().delete(SMS_CONTENT_URI, where.toString(), null);
 			Log.d(TAG, String.format("%d sms deleted", smsDeleted));
+			if(mms) {
+				mmsDeleted = context.getContentResolver().delete(MMS_CONTENT_URI, where.toString(), null);
+				Log.d(TAG, String.format("%d mms deleted", mmsDeleted));
+			}
 		}
 
 		String message;
 
-		if(call_log)
-			if(sms)
-				// both
-				message = String.format(context.getString(R.string.both_deleted), callsDeleted, smsDeleted);
-			else
-				// only calls
-				message = String.format(context.getString(R.string.call_deleted), callsDeleted);
-		else
-			if(sms)
-				// only sms
-				message = String.format(context.getString(R.string.sms_deleted), smsDeleted);
-			else
-				// neither
-				message = context.getString(R.string.nothing);
+		message = String.format(context.getString(R.string.msg_deleted), callsDeleted, smsDeleted, mmsDeleted);
 
 		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 		Log.i(TAG, message);
@@ -247,6 +257,8 @@ public class PurgeActivity extends TabActivity
 				this.finish();
 				return;
 			case R.id.sms:
+				((CheckBox)findViewById(R.id.mms))
+					.setEnabled(isChecked(R.id.sms));
 				if(hasLock())
 					((CheckBox)findViewById(R.id.locked_sms))
 						.setEnabled(isChecked(R.id.sms));
@@ -268,6 +280,8 @@ public class PurgeActivity extends TabActivity
 				}
 				return;
 			case R.id.auto_sms:
+				((CheckBox)findViewById(R.id.auto_mms))
+					.setEnabled(isChecked(R.id.auto_sms));
 				if(hasLock())
 					((CheckBox)findViewById(R.id.auto_locked_sms))
 						.setEnabled(isChecked(R.id.auto_sms));
@@ -293,8 +307,9 @@ public class PurgeActivity extends TabActivity
 					int days = getDays(R.id.days);
 					boolean call_log = isChecked(R.id.call_log);
 					boolean sms = isChecked(R.id.sms);
+					boolean mms = isChecked(R.id.mms);
 					boolean locked_sms = isChecked(R.id.locked_sms);
-					purge(this, days, call_log, sms, locked_sms);
+					purge(this, days, call_log, sms, mms, locked_sms);
 				}
 				return;
 			case R.id.set_auto:
