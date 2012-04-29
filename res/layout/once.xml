@@ -119,7 +119,6 @@
 	</ScrollView>
 
 	<LinearLayout
-		android:background="@android:drawable/bottom_bar"
 		android:padding="5dp"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
